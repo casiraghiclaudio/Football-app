@@ -4,6 +4,90 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Football App</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a0f; color: #e2e8f0; font-family: monospace; }
+    #app { padding: 20px; }
+    h1 { color: #fff; margin-bottom: 20px; }
+    .loading { color: #64748b; }
+    .error { color: #ef4444; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { color: #475569; text-align: left; padding: 8px 4px; border-bottom: 1px solid #1e293b; }
+    td { padding: 8px 4px; border-bottom: 1px solid #111827; }
+    .rank { color: #475569; width: 30px; }
+    .name { color: #94a3b8; }
+    .pts { color: #f1f5f9; font-weight: bold; }
+    .logo { width: 20px; height: 20px; object-fit: contain; }
+    .form span { display: inline-block; width: 14px; height: 14px; border-radius: 3px; font-size: 9px; font-weight: bold; color: #fff; text-align: center; line-height: 14px; margin: 1px; }
+    .W { background: #22c55e; }
+    .D { background: #f59e0b; }
+    .L { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>⚽ Serie A 2025/26</h1>
+    <p class="loading" id="status">Caricamento...</p>
+    <table id="table" style="display:none">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th></th>
+          <th>Squadra</th>
+          <th>G</th>
+          <th>V</th>
+          <th>N</th>
+          <th>P</th>
+          <th>GF</th>
+          <th>GS</th>
+          <th>DR</th>
+          <th>Pts</th>
+          <th>Forma</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <script>
+    fetch('/.netlify/functions/standings')
+      .then(r => r.json())
+      .then(data => {
+        const standings = data.response[0].league.standings[0];
+        const tbody = document.getElementById('tbody');
+        standings.forEach(t => {
+          const gd = t.all.goals.for - t.all.goals.against;
+          const form = (t.form || '').slice(-5).split('').map(r =>
+            `<span class="${r}">${r}</span>`).join('');
+          tbody.innerHTML += `<tr>
+            <td class="rank">${t.rank}</td>
+            <td><img class="logo" src="${t.team.logo}" onerror="this.style.display='none'"></td>
+            <td class="name">${t.team.name}</td>
+            <td>${t.all.played}</td>
+            <td>${t.all.win}</td>
+            <td>${t.all.draw}</td>
+            <td>${t.all.lose}</td>
+            <td>${t.all.goals.for}</td>
+            <td>${t.all.goals.against}</td>
+            <td>${gd > 0 ? '+' + gd : gd}</td>
+            <td class="pts">${t.points}</td>
+            <td class="form">${form}</td>
+          </tr>`;
+        });
+        document.getElementById('status').style.display = 'none';
+        document.getElementById('table').style.display = 'table';
+      })
+      .catch(e => {
+        document.getElementById('status').textContent = 'Errore: ' + e.message;
+        document.getElementById('status').className = 'error';
+      });
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Football App</title>
 </head>
 <body>
   <h1>Football App</h1>
